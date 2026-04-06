@@ -93,13 +93,9 @@ def evaluate(args):
             f"[EVAL-ERROR] Model parameter limit exceeded: {total_params:,} > {MAX_MODEL_PARAMS:,}. "
             "Please reduce model size and retry."
         )
-    # Thresholds for F1@[50:90:05] plus 25 and 95.
-    thr_50_90 = [float(x) for x in np.arange(0.50, 0.91, 0.05)]
-    all_thresholds = sorted(set([0.25, 0.95] + thr_50_90))
+    # Only measure F1@0.25 and F1@0.50.
+    all_thresholds = [0.25, 0.50]
     agg = {thr: {"tp": 0, "fp": 0, "fn": 0} for thr in all_thresholds}
-
-    fg_inter = 0
-    fg_union = 0
 
     per_scene_metrics = []
 
@@ -133,15 +129,6 @@ def evaluate(args):
             stem = os.path.splitext(os.path.basename(scene_path))[0]
             np.save(os.path.join(pred_save_dir, f"{stem}_pred.npy"), pred_instance)
 
-            # Semantic (obj-vs-bg) auxiliaries.
-            pred_fg = pred_instance > 0
-            gt_fg = gt_instance > 0
-            fg_inter += int(np.logical_and(pred_fg, gt_fg).sum())
-            fg_union += int(np.logical_or(pred_fg, gt_fg).sum())
-            scene_fg_inter = int(np.logical_and(pred_fg, gt_fg).sum())
-            scene_fg_union = int(np.logical_or(pred_fg, gt_fg).sum())
-            scene_object_miou = float(scene_fg_inter / scene_fg_union) if scene_fg_union > 0 else 0.0
-
             # Instance Hungarian matching.
             pred_ids, pred_masks = _labels_to_masks(pred_instance)
             gt_ids, gt_masks = _labels_to_masks(gt_instance)
@@ -166,6 +153,13 @@ def evaluate(args):
                 agg[thr]["fp"] += fp
                 agg[thr]["fn"] += fn
 
+            tp25, fp25, fn25 = _tp_fp_fn_from_matched(
+                matched_ious=matched_ious,
+                num_pred=len(pred_masks),
+                num_gt=len(gt_masks),
+                thr=0.25,
+            )
+            _, _, f1_25 = _prf(tp25, fp25, fn25)
             tp50, fp50, fn50 = _tp_fp_fn_from_matched(
                 matched_ious=matched_ious,
                 num_pred=len(pred_masks),
@@ -177,8 +171,8 @@ def evaluate(args):
                 "scene": stem,
                 "num_gt_instances": int(len(gt_masks)),
                 "num_pred_instances": int(len(pred_masks)),
+                "f1_25": f1_25,
                 "f1_50": f1_50,
-                "semantic_object_mIoU": scene_object_miou,
             }
             per_scene_metrics.append(scene_metric_entry)
 
@@ -211,10 +205,7 @@ def evaluate(args):
         f1_by_threshold[str(thr)] = float(f1)
 
     f1_25 = float(f1_by_threshold[str(0.25)])
-    f1_95 = float(f1_by_threshold[str(0.95)])
-    f1_50_90_05 = float(np.mean([f1_by_threshold[str(t)] for t in thr_50_90]))
-    final_score = 0.25 * f1_25 + 0.5 * f1_50_90_05 + 0.25 * f1_95
-    object_miou = float(fg_inter / fg_union) if fg_union > 0 else 0.0
+    f1_50 = float(f1_by_threshold[str(0.5)])
 
     metrics = {
         "evaluated_at": datetime.utcnow().isoformat() + "Z",
@@ -226,12 +217,8 @@ def evaluate(args):
         "max_allowed_instance_id": int(MAX_ALLOWED_INSTANCE_ID),
         "no_visualize_time_limit_seconds": float(NO_VIS_LOOP_TIME_LIMIT_SECONDS),
         "instance_f1_25": f1_25,
-        "instance_f1_95": f1_95,
-        "instance_f1_50_90_05": f1_50_90_05,
+        "instance_f1_50": f1_50,
         "instance_f1_by_threshold": f1_by_threshold,
-        "final_score": float(final_score),
-        "final_score_formula": "0.25*instance_f1_25 + 0.5*instance_f1_50_90_05 + 0.25*instance_f1_95",
-        "semantic_object_mIoU": object_miou,
     }
 
     metrics_path = os.path.join(args.output_dir, args.metrics_file)
@@ -242,9 +229,7 @@ def evaluate(args):
     with open(scene_metrics_path, "w", encoding="utf-8") as f:
         json.dump(per_scene_metrics, f, indent=2)
 
-    print(f"Instance F1 -> @25: {f1_25:.4f}, @50:90:05: {f1_50_90_05:.4f}, @95: {f1_95:.4f}")
-    print(f"Final Score: {final_score:.4f} = 0.25*F1@25 + 0.5*F1@50:90:05 + 0.25*F1@95")
-    print(f"Semantic Object mIoU: {object_miou:.4f}")
+    print(f"Instance F1 -> @25: {f1_25:.4f}, @50: {f1_50:.4f}")
     print(f"Predictions saved to: {pred_save_dir}")
     if args.visualize:
         print(f"Visualizations saved to: {vis_save_dir}")

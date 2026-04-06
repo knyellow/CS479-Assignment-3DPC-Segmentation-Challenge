@@ -2,12 +2,55 @@
 
 ## 3D Point Cloud Segmentation Challenge
 
-**Mid-Term Evaluation Submission Due**: April 26 (Sunday), 23:59 KST  
+**Mid-Term Evaluation Submission Due**: April 30 (Thursday), 23:59 KST  
 **Final Submission Due**: May 9 (Saturday), 23:59 KST  
 **Where to submit**: KLMS  
 
 ![Dataset](assets/figures/nubjuki.png)
 
+## What to Do
+
+In this challenge, your task is **single-category 3D point cloud instance segmentation**.
+
+For each scene point cloud, predict a point-wise instance label:
+
+$$
+\hat y_i \in \{0,1,2,\dots\}
+$$
+
+- `0`: background
+- `1,2,...`: predicted object instances (the order of instance IDs is arbitrary)
+
+Ground truth is also provided as point-wise instance labels with the same convention.
+
+This means:
+- the key task is to correctly separate background and multiple target instances,
+- matching between predictions and ground truth is permutation-invariant (handled in the evaluator).
+
+We provide the dataset format and a fixed evaluator. Your job is to improve the model in `training/model.py`.
+
+**Important Notes**
+
+PLEASE READ THE FOLLOWING CAREFULLY! Any violation of the rules, or failure to properly cite any existing code, models, or papers used in the project in your write-up, will result in a zero score.
+
+### What You CANNOT Do
+
+- ❌ **DO NOT** use any pretrained network.
+- ❌ **DO NOT** exceed the total model parameter limit (50M).
+- ❌ **DO NOT** use any extra dataset for training other than the provided training split (`train`, `val`) and reference objects (`sample.glb`).
+- ❌ **DO NOT** modify the provided `evaluate.py` in the official submission.
+- ❌ **DO NOT** use any CUDA version other than the provided one (default: 12.4).
+- ❌ **DO NOT** exceed the main inference loop time limit (300 seconds).
+- ❌ **DO NOT** exceed the VRAM limit (24GB).
+
+### What You CAN Do
+
+- ✅ **Modify `model.py`** to implement your own model.
+- ✅ **Implement your own dataset loader** based on the MultiScan dataset and the provided reference objects.
+- ✅ **Implement your own training pipeline** to train your model.
+- ✅ **Create new files**: Add any additional implementation files you need
+- ✅ **Use open-source implementations**: As long as they are clearly mentioned and cited in your write-up
+- ✅ **Use extra libraries**: If your implementation requires an additional library, please upload to the Slack channel with the library name and a brief justification. The TAs will review each request and approve or reject it. Only approved libraries may be used.
 
 ## Environment Setup
 
@@ -43,77 +86,27 @@ CS479-Assignment-3DPC-Segmentation-Challenge/
 - **SHOULD modify**: Main files where you implement your solution
 - **CAN modify**: Optional modifications to improve your model
 
-
-## What to Do
-
-In this challenge, your task is **single-category 3D point cloud instance segmentation**.
-
-For each scene point cloud, predict a point-wise instance label:
-
-$$
-\hat y_i \in \{0,1,2,\dots\}
-$$
-
-- `0`: background
-- `1,2,...`: predicted object instances (the order of instance IDs is arbitrary)
-
-Ground truth is also provided as point-wise instance labels with the same convention.
-
-This means:
-- the key task is to correctly separate background and multiple target instances,
-- matching between predictions and ground truth is permutation-invariant (handled in the evaluator).
-
-We provide the dataset format and a fixed evaluator. Your job is to improve the model in `training/model.py`.
-
 **Model interface constraint (must keep):**
 - `initialize_model(ckpt_path, device, ...) -> your_model: torch.nn.Module`: load model from checkpoint path
 - `run_inference(your_model, features, ...) -> [B, N]`: return point-wise instance labels
 
 You may freely change the model architecture, training strategy, and `model.py`, as long as the interface above remains compatible. You can also generate additional codes, but note that your code will be evaluated using the provided evaluator. The evaluation will be conducted using the provided `evaluate.py` without modification.
 
-**Important Notes**
-
-PLEASE READ THE FOLLOWING CAREFULLY! Any violation of the rules, or failure to properly cite any existing code, models, or papers used in the project in your write-up, will result in a zero score.
-
-### What You CANNOT Do
-
-- ❌ **DO NOT** use any pretrained network.
-- ❌ **DO NOT** exceed the total model parameter limit (50M).
-- ❌ **DO NOT** use any extra dataset for training other than the provided training split (`train`, `val`) and reference objects (`sample.glb`).
-- ❌ **DO NOT** modify the provided `evaluate.py` in the official submission.
-- ❌ **DO NOT** use any CUDA version other than the provided one (default: 12.4).
-- ❌ **DO NOT** exceed the main inference loop time limit (300 seconds).
-- ❌ **DO NOT** exceed the VRAM limit (24GB).
-
-### What You CAN Do
-
-- ✅ **Modify `model.py`** to implement your own model.
-- ✅ **Implement your own dataset loader** based on the MultiScan dataset and the provided reference objects.
-- ✅ **Implement your own training pipeline** to train your model.
-- ✅ **Create new files**: Add any additional implementation files you need
-- ✅ **Use open-source implementations**: As long as they are clearly mentioned and cited in your write-up
-
-### Additional Notes
-
-- You may use only the packages listed above. If your implementation requires an additional library, please upload to the Slack channel with the library name and a brief justification. The TAs will review each request and approve or reject it. Only approved libraries may be used.
-- Predicted instance IDs are valid only in `1..100`. Any predicted ID greater than `100` is remapped to background (`0`) before scoring.
-
-## Dataset and Base Code
+## MultiScan Dataset
 
 You are required to use the **MultiScan benchmark dataset** for training.
-
-<!-- ![Dataset](multiscan.png) -->
-
-Please follow the instructions in the original GitHub repository and download the benchmark dataset:
-
-[MultiScan Dataset README](https://github.com/smartscenes/multiscan/blob/main/dataset/README.md)
-
-- Object Instance Segmentation
 
 **Please note that downloading the dataset may take some time, so we recommend preparing it as early as possible.**
 
 We also provide an additional Google Drive link with reference 3D objects in `.glb` format:
 [Link]({https://drive.google.com/drive/folders/1guo68JlVkeqAzX7nR3DOfOB6SfhL3XC9?usp=sharing})
+
+
+Note that t
+[MultiScan Dataset README](https://github.com/smartscenes/multiscan/blob/main/dataset/README.md)
+
+- Object Instance Segmentation
+
 
 ## Generation Pipeline for Test Data
 
@@ -135,19 +128,18 @@ Saved dictionary keys:
 - `xyz`: `float32`, shape `(N, 3)`
 - `rgb`: `uint8`, shape `(N, 3)`
 - `normal`: `float32`, shape `(N, 3)`
-- `is_mesh`: `bool`, shape `(N,)`
 - `instance_labels`: `int32`, shape `(N,)` (`0` for background, positive IDs for inserted instances)
 
 We will also provide example test data. 
 
 ## Evaluation
 
-We will evaluate with the generated test data using two metrics: 1) instance segmentation and 2) semantic foreground segmentation quality.
+We evaluate instance segmentation results on the generated test data using the following metric.
 
-1) Instance evaluation uses Hungarian matching on point-level IoU between predicted and GT instances.
+Instance evaluation uses Hungarian matching based on point-level IoU between predicted and ground-truth instances.
 
 - For each scene:
-  - Convert point-wise instance labels (`id > 0`) to binary instance masks.
+  - Convert point-wise instance labels (`id > 0`) into binary instance masks.
   - Compute the pairwise IoU matrix between predicted and GT masks.
   - Run Hungarian matching (1-to-1 assignment) using cost `1 - IoU`.
   - For each IoU threshold $\tau$, count:
@@ -163,25 +155,9 @@ We will evaluate with the generated test data using two metrics: 1) instance seg
 
   where $TP_\tau$, $FP_\tau$, and $FN_\tau$ are aggregated over all scenes.
 
-- We report:
-  - $F1_{0.25}$
-  - $F1_{0.95}$
-  - $F1_{0.50:0.90:0.05} = \frac{1}{9}\sum_{\tau \in \{0.50,0.55,\dots,0.90\}} F1_\tau$
+- We will evaluate two thresholds: `F1@0.25`($F1_{0.25}$) and `F1@0.50`($F1_{0.50}$).
 
-- Final instance score:
-
-```math
-\text{Instance Score} = 0.25 \times F1_{0.25} + 0.5 \times F1_{0.50:0.90:0.05} + 0.25 \times F1_{0.95}
-```
-
-2) Semantic foreground quality is measured using foreground IoU:
-
-  ```math
-  \text{Semantic Score}
-  =
-  \frac{\sum_i \mathbf{1}[y_{\mathrm{pred},i} > 0 \land y_{\mathrm{gt},i} > 0]}
-  {\sum_i \mathbf{1}[y_{\mathrm{pred},i} > 0 \lor y_{\mathrm{gt},i} > 0]}
-  ```
+**Note**: Predicted instance IDs are valid only in `1..100`. Any predicted ID greater than `100` is remapped to background (`0`) before scoring.
 
 More details about the evaluation metrics are provided in `evaluate.py`.
 
@@ -207,8 +183,8 @@ The purpose of the mid-term evaluation is to help teams gauge their progress rel
 
 | Metric | TA Score |
 |---|---:|
-| Instance Score | `0.1254` |
-| Semantic Score | `0.4835` |
+| `F1@0.25` | 0.3853 |
+| `F1@0.50` | 0.1546 |
 
 - **What to submit**
   1. **Self-contained source code**
