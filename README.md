@@ -69,7 +69,7 @@ We provide the dataset format and a fixed evaluator. Your job is to improve the 
 - `initialize_model(ckpt_path, device, ...) -> your_model: torch.nn.Module`: load model from checkpoint path
 - `run_inference(your_model, features, ...) -> [B, N]`: return point-wise instance labels
 
-You may freely change the model architecture, training strategy, and `model.py`, as long as the interface above remains compatible. You can also generate additional codes, but note that your code will be evaluated using the provided evaluator, simply by replacing `evaluate.py`, so you should not modify the evaluator.
+You may freely change the model architecture, training strategy, and `model.py`, as long as the interface above remains compatible. You can also generate additional codes, but note that your code will be evaluated using the provided evaluator. The evaluation will be conducted using the provided `evaluate.py` without modification.
 
 **Important Notes**
 
@@ -88,7 +88,7 @@ PLEASE READ THE FOLLOWING CAREFULLY! Any violation of the rules, or failure to p
 ### What You CAN Do
 
 - ✅ **Modify `model.py`** to implement your own model.
-- ✅ **Implement your own dataset loader** to load your own dataset using multiscan dataset and reference object.
+- ✅ **Implement your own dataset loader** based on the MultiScan dataset and the provided reference objects.
 - ✅ **Implement your own training pipeline** to train your model.
 - ✅ **Create new files**: Add any additional implementation files you need
 - ✅ **Use open-source implementations**: As long as they are clearly mentioned and cited in your write-up
@@ -100,7 +100,7 @@ PLEASE READ THE FOLLOWING CAREFULLY! Any violation of the rules, or failure to p
 
 ## Dataset and Base Code
 
-You are required to use the **MultiScan benchmark dataset** for training and evaluation.
+You are required to use the **MultiScan benchmark dataset** for training.
 
 <!-- ![Dataset](multiscan.png) -->
 
@@ -117,7 +117,7 @@ We also provide an additional Google Drive link with reference 3D objects in `.g
 
 ## Generation Pipeline for Test Data
 
-For each output scene:
+For each generated scene:
 - a random number of objects is inserted (`min=1`, `max=5`)
 - mesh placement is attempted with multiple scale ratios (range: `0.025` to `0.2` of the scene diagonal)
 - an object may be placed on top of another object, with partial overhang allowed
@@ -138,11 +138,11 @@ Saved dictionary keys:
 - `is_mesh`: `bool`, shape `(N,)`
 - `instance_labels`: `int32`, shape `(N,)` (`0` for background, positive IDs for inserted instances)
 
-We will also provide example test datas. 
+We will also provide example test data. 
 
 ## Evaluation
 
-We will evaluate the generated test data using two metrics: 1) instance segmentation and 2) semantic foreground segmentation quality.
+We will evaluate with the generated test data using two metrics: 1) instance segmentation and 2) semantic foreground segmentation quality.
 
 1) Instance evaluation uses Hungarian matching on point-level IoU between predicted and GT instances.
 
@@ -174,7 +174,7 @@ We will evaluate the generated test data using two metrics: 1) instance segmenta
 \text{Instance Score} = 0.25 \times F1_{0.25} + 0.5 \times F1_{0.50:0.90:0.05} + 0.25 \times F1_{0.95}
 ```
 
-2) Semantic foreground quality is measured using `semantic_object_mIoU`:
+2) Semantic foreground quality is measured using foreground IoU:
 
   ```math
   \text{Semantic Score}
@@ -185,7 +185,7 @@ We will evaluate the generated test data using two metrics: 1) instance segmenta
 
 More details about the evaluation metrics are provided in `evaluate.py`.
 
-- The TAs provide scores below computed using their own implementation as reference values (the code will not be released). You are expected to match or exceed these reference values.
+- The TAs provide the reference scores computed using their own implementation as reference values (the code will not be released). You are expected to match or exceed these reference values.
 - Additionally, to help everyone gauge progress, there will be a [Mid-Term Evaluation](#mid-term-evaluation-submission-optional) where teams can submit intermediate results.
 - **Final grading will be determined relative to the best score achieved for each task.** Specifically, the score for each task is computed as follows:
 
