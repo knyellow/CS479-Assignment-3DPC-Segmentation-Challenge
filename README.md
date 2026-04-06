@@ -44,7 +44,7 @@ CS479-Assignment-3DPC-Segmentation-Challenge/
 - **CAN modify**: Optional modifications to improve your model
 
 
-### What to Do
+## What to Do
 
 In this challenge, your task is **single-category 3D point cloud instance segmentation**.
 
@@ -98,7 +98,7 @@ PLEASE READ THE FOLLOWING CAREFULLY! Any violation of the rules, or failure to p
 - You may use only the packages listed above. If your implementation requires an additional library, please upload to the Slack channel with the library name and a brief justification. The TAs will review each request and approve or reject it. Only approved libraries may be used.
 - Predicted instance IDs are valid only in `1..100`. Any predicted ID greater than `100` is remapped to background (`0`) before scoring.
 
-### Dataset and Base Code
+## Dataset and Base Code
 
 You are required to use the **MultiScan benchmark dataset** for training and evaluation.
 
@@ -115,7 +115,7 @@ Please follow the instructions in the original GitHub repository and download th
 We also provide an additional Google Drive link with reference 3D objects in `.glb` format:
 [Link]({https://drive.google.com/drive/folders/1guo68JlVkeqAzX7nR3DOfOB6SfhL3XC9?usp=sharing})
 
-### Generation Pipeline for Test Data
+## Generation Pipeline for Test Data
 
 For each output scene:
 - a random number of objects is inserted (`min=1`, `max=5`)
@@ -127,7 +127,7 @@ Once the object is placed, the point cloud is extracted with the following augme
 - affine transform: rotation around the x,y,z-axis in the range `(-180, 180)`
 - color map jittering
 
-#### Test Data Format
+## Test Data Format
 
 Each generated scenes are saved as `.npy` files with the following format:
 
@@ -140,7 +140,7 @@ Saved dictionary keys:
 
 We will also provide example test datas. 
 
-### Evaluation
+## Evaluation
 
 We will evaluate the generated test data using two metrics: 1) instance segmentation and 2) semantic foreground segmentation quality.
 
@@ -156,9 +156,9 @@ We will evaluate the generated test data using two metrics: 1) instance segmenta
     - `FN_\tau`: GT instances not counted as TP
 
 - For each threshold `\tau`, compute:
-  $$
-  F1_\tau = \frac{2\,TP_\tau}{2\,TP_\tau + FP_\tau + FN_\tau}
-  $$
+    $$
+    F1_{\tau} = \frac{2 TP_{\tau}}{2 TP_{\tau} + FP_{\tau} + FN_{\tau}}
+    $$
   where `TP_\tau`, `FP_\tau`, and `FN_\tau` are aggregated over all scenes.
 
 - We report:
@@ -197,7 +197,7 @@ $$
 
 - In total, the 3D Point Cloud Segmentation Challenge is worth a maximum of 20 points.
 
-### Mid-Term Evaluation Submission (Optional)
+## Mid-Term Evaluation Submission (Optional)
 
 The purpose of the mid-term evaluation is to help teams gauge their progress relative to others. **Participation is optional**, but the top-k teams for each task that outperform the TAs’ scores will receive **bonus credit** toward the final grade.
 
@@ -219,7 +219,7 @@ The purpose of the mid-term evaluation is to help teams gauge their progress rel
   - Submissions that fail to run in the TA environment will be marked as failed on the leaderboard.
   - Among the submissions that outperform the TAs’ scores, the top-k teams will receive bonus credit.
 
-### Final Submission
+## Final Submission
 
 - **What to submit**:
   1. **Self-contained source code**
@@ -232,21 +232,21 @@ The purpose of the mid-term evaluation is to help teams gauge their progress rel
           - **Training details**: Training logs (e.g., training loss curves) and the total training time.
           - **Qualitative evidence**: Approximately four rendered sample images with segmentation results.
           - **Citations**: All external code and papers used must be properly cited.
-      - ^^Missing any of these items will result in a penalty.^^
-      - ^^If the write-up exceeds two pages, any content beyond the second page will be ignored, which may result in missing required items.^^
+      - Missing any of these items will result in a penalty.
+      - If the write-up exceeds two pages, any content beyond the second page will be ignored, which may result in missing required items.
 
-### Grading
+## Grading
 
-^^**There are no late days. Submit on time.**^^  
-**Late submission**: ==Zero score==.  
-**Missing any required item in the final submission (qualitative results, code/checkpoint, or write-up)**: ==Zero score==.  
-**Missing items in the write-up**: ==10% penalty for each==. 
+**There are no late days. Submit on time.**  
+**Late submission**: Zero score.  
+**Missing any required item in the final submission (qualitative results, code/checkpoint, or write-up)**: Zero score.  
+**Missing items in the write-up**: 10% penalty for each. 
 
-### Recommended Readings
-[1] [Mao et al., MultiScan: Scalable RGBD scanning for 3D environments with articulated objects, NeurIPS 2022.](https://proceedings.neurips.cc/paper_files/paper/2022/hash/3b3a83a5d86e1d424daefed43d998079-Abstract-Conference.html){:target="_blank"} [[Github]](https://github.com/smartscenes/multiscan){:target="_blank"} [[Benchmark Docs]](https://3dlg-hcvc.github.io/multiscan/read-the-docs/benchmark/dataset.html#object-instance-segmentation){:target="_blank"}  
-[2] [Jiang et al., PointGroup: Dual-Set Point Grouping for 3D Instance Segmentation, CVPR 2020.](https://arxiv.org/abs/2004.01658){:target="_blank"}  
-[3] [Liang et al., Instance Segmentation in 3D Scenes using Semantic Superpoint Tree Networks, ICCV 2021.](https://arxiv.org/abs/2108.07478){:target="_blank"}  
-[4] [Chen et al., Hierarchical Aggregation for 3D Instance Segmentation, ICCV 2021.](https://arxiv.org/abs/2108.02350){:target="_blank"}
+## Recommended Readings
+[1] [Mao et al., MultiScan: Scalable RGBD scanning for 3D environments with articulated objects, NeurIPS 2022.](https://proceedings.neurips.cc/paper_files/paper/2022/hash/3b3a83a5d86e1d424daefed43d998079-Abstract-Conference.html) [[Github]](https://github.com/smartscenes/multiscan) [[Benchmark Docs]](https://3dlg-hcvc.github.io/multiscan/read-the-docs/benchmark/dataset.html#object-instance-segmentation)  
+[2] [Jiang et al., PointGroup: Dual-Set Point Grouping for 3D Instance Segmentation, CVPR 2020.](https://arxiv.org/abs/2004.01658)  
+[3] [Liang et al., Instance Segmentation in 3D Scenes using Semantic Superpoint Tree Networks, ICCV 2021.](https://arxiv.org/abs/2108.07478)  
+[4] [Chen et al., Hierarchical Aggregation for 3D Instance Segmentation, ICCV 2021.](https://arxiv.org/abs/2108.02350)
 
 <br />
 
