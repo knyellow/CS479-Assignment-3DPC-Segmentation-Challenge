@@ -156,9 +156,7 @@ We will evaluate the generated test data using two metrics: 1) instance segmenta
     - $FN_\tau$: GT instances not counted as TP
 
 - For each threshold $\tau$, compute:
-    <!-- $$
-    F1_{\tau} = \frac{2 TP_{\tau}}{2 TP_{\tau} + FP_{\tau} + FN_{\tau}}
-    $$ -->
+
     ```math
     F1_{\tau} = \frac{2 TP_{\tau}}{2 TP_{\tau} + FP_{\tau} + FN_{\tau}}
     ```
@@ -170,11 +168,13 @@ We will evaluate the generated test data using two metrics: 1) instance segmenta
   - $F1_{0.50:0.90:0.05} = \frac{1}{9}\sum_{\tau \in \{0.50,0.55,\dots,0.90\}} F1_\tau$
 
 - Final instance score:
+
     ```math
     \text{Instance Score} = 0.25 \times F1_{0.25} + 0.5 \times F1_{0.50:0.90:0.05} + 0.25 \times F1_{0.95}
     ```
 
 2) Semantic foreground quality is measured using `semantic_object_mIoU`:
+
     ```math
     \text{Semantic Score}
     =
