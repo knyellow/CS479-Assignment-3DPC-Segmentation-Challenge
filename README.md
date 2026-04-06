@@ -157,9 +157,9 @@ We will evaluate the generated test data using two metrics: 1) instance segmenta
 
 - For each threshold $\tau$, compute:
 
-  ```math
-  \text{F1}_{\tau} = \frac{2 \text{TP}_{\tau}}{2 \text{TP}_{\tau} + \text{FP}_{\tau} + \text{FN}_{\tau}}
-  ```
+```math
+\text{F1}_{\tau} = \frac{2 \text{TP}_{\tau}}{2 \text{TP}_{\tau} + \text{FP}_{\tau} + \text{FN}_{\tau}}
+```
 
   where $TP_\tau$, $FP_\tau$, and $FN_\tau$ are aggregated over all scenes.
 
