@@ -156,9 +156,9 @@ We will evaluate the generated test data using two metrics: 1) instance segmenta
     - `FN_\tau`: GT instances not counted as TP
 
 - For each threshold `\tau`, compute:
-    $$
+    $
     F1_{\tau} = \frac{2 TP_{\tau}}{2 TP_{\tau} + FP_{\tau} + FN_{\tau}}
-    $$
+    $
   where `TP_\tau`, `FP_\tau`, and `FN_\tau` are aggregated over all scenes.
 
 - We report:
