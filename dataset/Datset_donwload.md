@@ -14,6 +14,7 @@ python gen_instsegm_dataset.py input_path=/path/to/multiscan_dataset output_path
 
 ## Structure
 
+```
 dataset/
 └── multiscan.glb # Multiscan dataset(not in Github)
 
@@ -26,3 +27,4 @@ CS479-Assignment-3DPC-Segmentation-Challenge/
 ├── evaluate.py            # Evaluation script (provided, DO NOT MODIFY)
 ├── model.py               # Model definition (students SHOULD modify)
 └── visualize.py           # Visualization script (provided, CAN modify)
+```
